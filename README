@@ -1,1 +1,5 @@
-Never write anything to USB host - this way you may use non-patched cdc-acm driver (on raspberry pi openwrt).
+* on pro micro:
+wmerge ../avrtel/avrtel clock >merged.w
+wmerge merged invert | sponge merged.w
+ctangle merged ../avrtel/invert clock
+

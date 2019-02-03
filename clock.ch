@@ -1,3 +1,6 @@
+WARNING: never write anything to USB host - this way you may use non-patched 
+cdc-acm driver (on raspberry pi openwrt)
+
 @x
 volatile int keydetect = 0;
 ISR(INT1_vect)
@@ -21,7 +24,6 @@ void LCD_Command( unsigned char cmnd )
         PORTB &= ~ (1<<PB5);
         _delay_ms(2);
 }
-
 
 void LCD_Char( unsigned char data )
 {
@@ -52,7 +54,6 @@ void LCD_Init (void)                    /* LCD Initialize function */
         LCD_Command(0x01);              /* Clear display screen*/
         _delay_ms(2);
 }
-
 
 @x
   UENUM = EP1;
