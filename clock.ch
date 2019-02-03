@@ -119,8 +119,7 @@ void LCD_Init (void)                    /* LCD Initialize function */
     if (UEINTX & 1 << RXOUTI) {
       UEINTX &= ~(1 << RXOUTI);
       int rx_counter = UEBCLX;
-      if (rx_counter != 8) PORTD &= ~(1 << PD5); /* proof check (this cannot happen)
-        ATTENTION: already inverted */
+      if (rx_counter != 8) PORTD |= 1 << PD5; /* proof check (this cannot happen) */
       PORTE |= 1 << PE6; DDRE |= 1 << PE6;
       LCD_Command(0x80);
       DDRE &= ~(1 << PE6); PORTE &= ~(1 << PE6);
