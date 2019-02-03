@@ -7,15 +7,14 @@ int main(void)
 {
   @<Set external encoding@>@;
   @<Open com-port@>@;
-  char str[100];
   while (1) {
     time_t now = time(NULL);
-//TODO: use code from "watch -n1"
-    sprintf(str, "%.*s", 8, ctime(&now) + 11);
-    if (write(comfd, str, 8) == -1) {
+    if (write(comfd, ctime(&now) + 11, 8) == -1) {
       close(comfd);
       @<Reopen com-port@>@;
+      continue;
     }
+    sleep(1); /* FIXME: use code from `\.{watch -n1}'? */
   }
 }
 
