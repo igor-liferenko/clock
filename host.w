@@ -10,8 +10,9 @@ int main(void)
   char str[100];
   while (1) {
     time_t now = time(NULL);
-    sprintf(str, "%.*s\n", 8, ctime(&now) + 11);
-    if (write(comfd, str, 9) == -1) {
+//TODO: use code from "watch -n1"
+    sprintf(str, "%.*s", 8, ctime(&now) + 11);
+    if (write(comfd, str, 8) == -1) {
       close(comfd);
       @<Reopen com-port@>@;
     }
