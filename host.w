@@ -33,15 +33,15 @@ int main(void)
   while (1) {
     if (comfd == -1) {
       signal(SIGALRM, SIG_DFL);
-      while ((comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY)) == -1)
-        sleep(1);
-      struct termios com_tty;
-      tcgetattr(comfd, &com_tty);
-      cfmakeraw(&com_tty);
-      tcsetattr(comfd, TCSANOW, &com_tty);
-      int DTR_bit = TIOCM_DTR;                 
-      ioctl(comfd, TIOCMBIS, &DTR_bit);
-      sigaction(SIGALRM, &psa, NULL);
+      if ((comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY)) != -1) {
+        struct termios com_tty;
+        tcgetattr(comfd, &com_tty);
+        cfmakeraw(&com_tty);
+        tcsetattr(comfd, TCSANOW, &com_tty);
+        int DTR_bit = TIOCM_DTR;                 
+        ioctl(comfd, TIOCMBIS, &DTR_bit);
+        sigaction(SIGALRM, &psa, NULL);
+      }
     }
     sleep(1);
   }
