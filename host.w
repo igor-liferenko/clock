@@ -1,50 +1,30 @@
-@ @d COM_PORT "/dev/ttyACM0"
-
-@c
-@<Header files@>@;
-
-int comfd;
-int DTR_bit = TIOCM_DTR; /* |DTR| line */
-struct termios com_tty_restore;
-struct termios com_tty;
+@ @c
+#include <fcntl.h> 
+#include <sys/ioctl.h> 
+#include <termios.h> 
+#include <time.h> 
+#include <unistd.h> 
 
 int main(void)
 {
-  @<Open com-port@>@;
+  int comfd = -1;
   while (1) {
+    if (comfd == -1) {
+      while ((comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY)) == -1)
+        sleep(1);
+      struct termios com_tty;
+      tcgetattr(comfd, &com_tty);
+      cfmakeraw(&com_tty);
+      tcsetattr(comfd, TCSANOW, &com_tty);
+      int DTR_bit = TIOCM_DTR;                 
+      ioctl(comfd, TIOCMBIS, &DTR_bit);
+    }
     time_t now = time(NULL);
     if (write(comfd, ctime(&now) + 11, 8) == -1) {
       close(comfd);
-      @<Reopen com-port@>@;
+      comfd = -1;
       continue;
     }
-    sleep(1); /* FIXME: use code from `\.{watch -n1}'? */
+    sleep(1);
   }
 }
-
-@ @<Open com-port@>=
-if ((comfd = open(COM_PORT, O_WRONLY | O_NOCTTY)) == -1) {
-  @<Reopen com-port@>@;
-}
-else {
-  tcgetattr(comfd, &com_tty);
-  cfmakeraw(&com_tty);
-  tcsetattr(comfd, TCSANOW, &com_tty);
-  ioctl(comfd, TIOCMBIS, &DTR_bit); /* set |DTR| */
-}
-
-@ @<Reopen com-port@>=
-while ((comfd = open(COM_PORT, O_WRONLY | O_NOCTTY)) == -1)
-  sleep(1);
-tcgetattr(comfd, &com_tty);
-cfmakeraw(&com_tty);
-tcsetattr(comfd, TCSANOW, &com_tty);
-ioctl(comfd, TIOCMBIS, &DTR_bit); /* set |DTR| */
-
-@ @<Header...@>=
-#include <termios.h> /* |struct termios|, |tcgetattr|, |tcsetattr|, |TCSANOW|,
-  |cfmakeraw|, |TIOCM_DTR| */
-#include <fcntl.h> /* |open|, |O_WRONLY| */
-#include <unistd.h> /* |close|, |write| */
-#include <sys/ioctl.h> /* |ioctl|, |TIOCMBIS|, |TIOCMBIC| */
-#include <time.h> /* |time| */
