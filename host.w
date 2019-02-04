@@ -38,7 +38,7 @@ int main(void)
         tcgetattr(comfd, &com_tty);
         cfmakeraw(&com_tty);
         tcsetattr(comfd, TCSANOW, &com_tty);
-        int DTR_bit = TIOCM_DTR;                 
+        int DTR_bit = TIOCM_DTR;
         ioctl(comfd, TIOCMBIS, &DTR_bit);
         sigaction(SIGALRM, &psa, NULL);
       }
