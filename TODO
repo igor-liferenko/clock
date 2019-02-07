@@ -1,1 +1,4 @@
 google "measure analog voltage on ARDUINO" tutorial and take wiring from there (not Arduino IDE code)
+
+NOTE: use max7221 instead of max7219 because photorisistor (https://playground.arduino.cc/Main/MAX72XXHardware#SelectProduct)
+https://electronics.stackexchange.com/questions/24146/arduino-max7221-common-anode-4-digit-7-seg-led-array
