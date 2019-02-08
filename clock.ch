@@ -63,6 +63,7 @@ void LCD_Init (void)                    /* LCD Initialize function */
 @z
 
 @x
+  @<Set |PD2| to pullup mode@>@;
   EICRA |= 1 << ISC11 | 1 << ISC10; /* set INT1 to trigger on rising edge */
   EIMSK |= 1 << INT1; /* turn on INT1; if it happens while USB RESET interrupt
     is processed, it does not change anything, as the device is going to be reset;
@@ -99,7 +100,8 @@ void LCD_Init (void)                    /* LCD Initialize function */
 @z
 
 @x
-    @<Check |PD2|, indicate it via |PD5| and notify USB host if it changed@>@;
+    @<Check |PD2| and indicate it via |PD5| and if it changed write to USB `\.\@' or `\.\%'
+      (the latter only if DTR)@>@;
     if (keydetect) {
       keydetect = 0;
       switch (PINB & (1 << PB4 | 1 << PB5 | 1 << PB6) | PIND & 1 << PD7) {
@@ -152,7 +154,7 @@ $$\hbox to9cm{\vbox to5.93cm{\vfil\special{psfile=avrtel.4
   clip llx=0 lly=0 urx=663 ury=437 rwi=2551}}\hfil}$$
 
 @<Check |PD2| and indicate it via |PD5| and if it changed write to USB `\.\@' or `\.\%'
-      (the latter only if DTR)@>=
+  (the latter only if DTR)@>=
 if (PIND & 1 << PD2) { /* off-line */
   if (PORTD & 1 << PD5) { /* transition happened */
     if (line_status.DTR) { /* off-line was not caused by un-powering base station */
@@ -173,6 +175,27 @@ else { /* on-line */
   }
   PORTD |= 1 << PD5;
 }
+
+@ The pull-up resistor is connected to the high voltage (this is usually 3.3V or 5V and is
+often refereed to as VCC).
+
+Pull-ups are often used with buttons and switches.
+
+With a pull-up resistor, the input pin will read a high state when the photo-transistor
+is not opened. In other words, a small amount of current is flowing between VCC and the input
+pin (not to ground), thus the input pin reads close to VCC. When the photo-transistor is
+opened, it connects the input pin directly to ground. The current flows through the resistor
+to ground, thus the input pin reads a low state.
+
+Since pull-up resistors are so commonly needed, our MCU has internal pull-ups
+that can be enabled and disabled.
+
+$$\hbox to7.54cm{\vbox to3.98638888888889cm{\vfil\special{psfile=avrtel.2
+  clip llx=0 lly=0 urx=214 ury=113 rwi=2140}}\hfil}$$
+
+@<Set |PD2| to pullup mode@>=
+PORTD |= 1 << PD2;
+_delay_us(1); /* after enabling pullup, wait for the pin to settle before reading it */
 @y
 @z
 
