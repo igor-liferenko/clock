@@ -1,4 +1,11 @@
-@ @c
+@ 
+ctime is equivalent to this:
+time_t now = time(NULL);
+struct tm *дата = localtime(&now);
+if (год == (дата->tm_year + 1900) && месяц == (дата->tm_mon + 1) && день == дата->tm_mday) {
+Read about signal safety of localtime in cdr-coral.w
+
+@c
 #include <fcntl.h> 
 #include <signal.h>
 #include <sys/ioctl.h> 
