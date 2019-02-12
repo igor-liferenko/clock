@@ -41,8 +41,10 @@ int main(void)
     within 1 second after setting the timer, so it is not necessary to call |signal| before
     setting the timer */
 
-  struct sigaction psa;
-  psa.sa_handler = my_write;
+  struct sigaction sa;
+  sa.sa_handler = my_write;
+//?  sigemptyset(&sa.sa_mask);
+//?  sa.sa_flags = SA_RESTART;
 
   while (1) {
     if (comfd == -1) {
@@ -55,7 +57,7 @@ int main(void)
         tcsetattr(comfd, TCSANOW, &com_tty);
         int DTR_bit = TIOCM_DTR;
         ioctl(comfd, TIOCMBIS, &DTR_bit);
-        sigaction(SIGALRM, &psa, NULL);
+        sigaction(SIGALRM, &sa, NULL);
       }
     }
     sleep(1);
