@@ -1,4 +1,9 @@
-@ 
+@* Intro.
+
+Serial port is done via USB, so it may suddenly appear or disappear;
+for this status is always checked and (re)connect is constantly
+attempted after a timeout.
+
 ctime is equivalent to this:
 time_t now = time(NULL);
 struct tm *дата = localtime(&now);
