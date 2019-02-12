@@ -1,2 +1,9 @@
 host
-host.c
+*.c
+*.dvi
+*.idx
+*.log
+*.ps
+*.scn
+*.tex
+*.toc
