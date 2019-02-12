@@ -4,6 +4,22 @@ Serial port is done via USB, so it appears and disappears dynamically;
 to cope with this, connect is attempted in a loop and write status
 is checked and port is closed if necessary in signal handler.
 
+When the handler for the signal is invoked, that signal is automatically
+blocked until the handler returns. We need not the signal be delivered after
+the handler returns (just in case the handler takes too long to execute),
+so we disable signal handler inside signal handler.
+
+The signal may arrive only during |pause|,
+so |localtime|, used by |ctime|, which is not signal-safe, may be used in
+signal handler.
+
+According to signal(2), using |signal| is allowed
+with |SIG_IGN|.
+
+It is unlikely that |signal| will not be called
+within 1 second after setting the timer, so it is not necessary to call |signal| before
+setting the timer.
+
 @c
 #include <fcntl.h> 
 #include <signal.h>
@@ -14,38 +30,33 @@ is checked and port is closed if necessary in signal handler.
 #include <unistd.h> 
 
 volatile int comfd = -1;
-void my_write(int signum) /* it is expected that this handler runs in less that 1 second;
-  not signal-safe function is used here, so for stable operation you may need to cancel
-  the signal (no block, because we need not the signal be delivered after unblock)
-  while the handler is executing - think how to do it */
+void my_write(int signum)
 {
   if (comfd == -1) return;
+  signal(SIGALRM, SIG_IGN);
   time_t now = time(NULL);
-  if (write(comfd, ctime(&now) + 11, 8) == -1) { /* signal may arrive only during |pause|,
-    so |localtime|, used by |ctime|, which is not signal-safe, may be used here */
+  if (write(comfd, ctime(&now) + 11, 8) == -1) {
     close(comfd);
     comfd = -1;
   }
+  sigaction(SIGALRM, &sa, NULL);
 }
 
-int main(void)
+void main(void)
 {
+  struct sigaction sa;
+  sa.sa_handler = my_write;
+
   struct itimerval tv;
   tv.it_value.tv_sec = 1;
   tv.it_value.tv_usec = 0;
   tv.it_interval.tv_sec = 1; /* when timer expires, reset to 1s */
   tv.it_interval.tv_usec = 0;
-  setitimer(ITIMER_REAL, &tv, NULL); /* it is unlikely that |signal| will not be called
-    within 1 second after setting the timer, so it is not necessary to call |signal| before
-    setting the timer */
-
-  struct sigaction sa;
-  sa.sa_handler = my_write;
+  setitimer(ITIMER_REAL, &tv, NULL);
 
   while (1) {
     if (comfd == -1) {
-      signal(SIGALRM, SIG_IGN); /* according to signal(2), using |signal| is allowed
-        in this case */
+      signal(SIGALRM, SIG_IGN);
       if ((comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY)) != -1) {
         struct termios com_tty;
         tcgetattr(comfd, &com_tty);
@@ -54,7 +65,7 @@ int main(void)
         int DTR_bit = TIOCM_DTR;
         ioctl(comfd, TIOCMBIS, &DTR_bit);
       }
-      sigaction(SIGALRM, &sa, NULL); /* (re)enable signal handler */
+      sigaction(SIGALRM, &sa, NULL);
     }
     pause();
   }
