@@ -30,6 +30,7 @@ setting the timer.
 #include <unistd.h> 
 
 volatile int comfd = -1;
+struct sigaction sa; /* (no \&{volatile}) */
 void my_write(int signum)
 {
   if (comfd == -1) return;
@@ -44,7 +45,6 @@ void my_write(int signum)
 
 void main(void)
 {
-  struct sigaction sa;
   sa.sa_handler = my_write;
 
   struct itimerval tv;
