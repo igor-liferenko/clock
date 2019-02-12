@@ -1,7 +1,7 @@
 @* Intro.
 
 Serial port is done via USB, so it appears and disappears dynamically;
-for this status is always checked and (re)connect is constantly
+to cope with this, status is always checked and (re)connect is constantly
 attempted after a timeout.
 
 ctime is equivalent to this:
