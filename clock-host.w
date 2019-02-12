@@ -30,8 +30,6 @@ void main(void)
     tcgetattr(comfd, &com_tty);
     cfmakeraw(&com_tty);
     tcsetattr(comfd, TCSANOW, &com_tty);
-    int DTR_bit = TIOCM_DTR;
-    ioctl(comfd, TIOCMBIS, &DTR_bit);
   }
 }
 
@@ -45,7 +43,6 @@ void main(void)
 
 @ @<Header files@>=
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
