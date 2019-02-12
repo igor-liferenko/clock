@@ -1,6 +1,6 @@
 @* Intro.
 
-Serial port is done via USB, so it may suddenly appear or disappear;
+Serial port is done via USB, so it appears and disappears dynamically;
 for this status is always checked and (re)connect is constantly
 attempted after a timeout.
 
@@ -37,14 +37,17 @@ int main(void)
   tv.it_value.tv_usec = 0;
   tv.it_interval.tv_sec = 1; /* when timer expires, reset to 1s */
   tv.it_interval.tv_usec = 0;
-  setitimer(ITIMER_REAL, &tv, NULL);
+  setitimer(ITIMER_REAL, &tv, NULL); /* it is unlikely that |signal| will not be called
+    within 1 second after setting the timer, so it is not necessary to call |signal| before
+    setting the timer */
 
   struct sigaction psa;
   psa.sa_handler = my_write;
 
   while (1) {
     if (comfd == -1) {
-      signal(SIGALRM, SIG_DFL);
+      signal(SIGALRM, SIG_IGN); /* according to signal(2), using |signal| is allowed
+        in this case */
       if ((comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY)) != -1) {
         struct termios com_tty;
         tcgetattr(comfd, &com_tty);
