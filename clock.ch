@@ -1,6 +1,8 @@
 WARNING: never write anything to USB host - this way you may use non-patched 
 cdc-acm driver (on raspberry pi openwrt)
 
+This program runs on USB-device.
+
 @x
 volatile int keydetect = 0;
 ISR(INT1_vect)
