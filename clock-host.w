@@ -68,6 +68,6 @@ void main(void)
       }
       sigaction(SIGALRM, &sa, NULL);
     }
-    pause();
+    pause(); /* sleep until timer expires */
   }
 }
