@@ -1,14 +1,8 @@
 @* Intro.
 
 Serial port is done via USB, so it appears and disappears dynamically;
-to cope with this, status is always checked and (re)connect is constantly
-attempted after a timeout.
-
-ctime is equivalent to this:
-time_t now = time(NULL);
-struct tm *дата = localtime(&now);
-if (год == (дата->tm_year + 1900) && месяц == (дата->tm_mon + 1) && день == дата->tm_mday) {
-Read about signal safety of localtime in cdr-coral.w
+to cope with this, connect is attempted in a loop and write status
+is checked and port is closed if necessary in signal handler.
 
 @c
 #include <fcntl.h> 
@@ -20,11 +14,15 @@ Read about signal safety of localtime in cdr-coral.w
 #include <unistd.h> 
 
 volatile int comfd = -1;
-void my_write(int signum)
+void my_write(int signum) /* it is expected that this handler runs in less that 1 second;
+  not signal-safe function is used here, so for stable operation you may need to cancel
+  the signal (no block, because we need not the signal be delivered after unblock)
+  while the handler is executing - think how to do it */
 {
   if (comfd == -1) return;
   time_t now = time(NULL);
-  if (write(comfd, ctime(&now) + 11, 8) == -1) {
+  if (write(comfd, ctime(&now) + 11, 8) == -1) { /* signal may arrive only during |pause|,
+    so |localtime|, used by |ctime|, which is not signal-safe, may be used here */
     close(comfd);
     comfd = -1;
   }
@@ -43,8 +41,6 @@ int main(void)
 
   struct sigaction sa;
   sa.sa_handler = my_write;
-//?  sigemptyset(&sa.sa_mask);
-//?  sa.sa_flags = SA_RESTART;
 
   while (1) {
     if (comfd == -1) {
@@ -57,9 +53,9 @@ int main(void)
         tcsetattr(comfd, TCSANOW, &com_tty);
         int DTR_bit = TIOCM_DTR;
         ioctl(comfd, TIOCMBIS, &DTR_bit);
-        sigaction(SIGALRM, &sa, NULL);
       }
+      sigaction(SIGALRM, &sa, NULL); /* (re)enable signal handler */
     }
-    sleep(1);
+    pause();
   }
 }
