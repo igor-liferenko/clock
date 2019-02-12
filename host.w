@@ -16,10 +16,6 @@ signal handler.
 According to signal(2), using |signal| is allowed
 with |SIG_IGN|.
 
-It is unlikely that |signal| will not be called
-within 1 second after setting the timer, so it is not necessary to call |signal| before
-setting the timer.
-
 @c
 #include <fcntl.h> 
 #include <signal.h>
@@ -29,8 +25,9 @@ setting the timer.
 #include <time.h> 
 #include <unistd.h> 
 
+struct sigaction sa;
 volatile int comfd = -1;
-struct sigaction sa; /* (no \&{volatile}) */
+
 void my_write(int signum)
 {
   if (comfd == -1) return;
@@ -46,6 +43,8 @@ void my_write(int signum)
 void main(void)
 {
   sa.sa_handler = my_write;
+
+  signal(SIGALRM, SIG_IGN); /* default terminates the process */
 
   struct itimerval tv;
   tv.it_value.tv_sec = 1;
