@@ -1,9 +1,10 @@
-WARNING: never write anything to USB host - this way you may use non-patched 
+NOTE: as we do not write anything to USB host, we may use non-patched 
 cdc-acm driver (on raspberry pi openwrt)
 
-We handle DTR here (and set in host program) as a common case, although it is not
-needed when writes are not done from usb device (but if you use
-non-patched cdc-acm driver, it is needed, because DTR is set automatically).
+We handle DTR here because it is automatically sent to device by driver on open()
+('0' in patched cdc-acm driver and '1' in non-patched), otherwise program will be
+blocked on open() for 5 sec.
+TODO: check it via wireshark
 
 @x
 volatile int keydetect = 0;
