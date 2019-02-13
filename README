@@ -1,5 +1,4 @@
 * on pro micro:
-wmerge ../avrtel/avrtel clock >merged.w
+wmerge ../avrtel/avrtel time-read >merged.w
 wmerge merged invert | sponge merged.w
-ctangle merged ../avrtel/invert clock
-
+ctangle merged ../avrtel/invert time-read
