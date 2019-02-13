@@ -23,7 +23,7 @@ void main(void)
 }
 
 @ @<Try to open serial port@>=
-comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
+comfd = open("/dev/ttyACM0", O_WRONLY | O_NOCTTY);
 
 @ @<Write time to serial port@>= {
   time_t now = time(NULL);
