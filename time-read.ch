@@ -1,5 +1,9 @@
-WARNING: never write anything to USB host and handle DTR - this way you may use non-patched 
-cdc-acm driver
+WARNING: never write anything to USB host - this way you may use non-patched 
+cdc-acm driver (on raspberry pi openwrt)
+
+We handle DTR here (and set in host program) as a common case, although it is not
+needed when writes are not done from usb device (but if you use
+non-patched cdc-acm driver, it is needed, because DTR is set automatically).
 
 @x
 volatile int keydetect = 0;

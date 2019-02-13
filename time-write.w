@@ -28,8 +28,8 @@ void main(void)
     tcgetattr(comfd, &com_tty);
     cfmakeraw(&com_tty);
     tcsetattr(comfd, TCSANOW, &com_tty);
-    int DTR_bit = TIOCM_DTR;
-    ioctl(comfd, TIOCMBIS, &DTR_bit);
+    int DTR_bit = TIOCM_DTR; /* we set DTR as common case, although it is not needed here, */
+    ioctl(comfd, TIOCMBIS, &DTR_bit); /* because writes are not done from device */
   }
 }
 
