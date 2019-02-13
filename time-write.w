@@ -22,16 +22,8 @@ void main(void)
   }
 }
 
-@ @<Try to open serial port@>= {
-  if ((comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY)) != -1) {
-    struct termios com_tty;
-    tcgetattr(comfd, &com_tty);
-    cfmakeraw(&com_tty);
-    tcsetattr(comfd, TCSANOW, &com_tty);
-    int DTR_bit = TIOCM_DTR; /* we set DTR as common case, although it is not needed here, */
-    ioctl(comfd, TIOCMBIS, &DTR_bit); /* because writes are not done from device */
-  }
-}
+@ @<Try to open serial port@>=
+comfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
 
 @ @<Write time to serial port@>= {
   time_t now = time(NULL);
@@ -43,7 +35,6 @@ void main(void)
 
 @ @<Header files@>=
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
