@@ -1,4 +1,4 @@
-clock-host
+time-write
 *.c
 *.dvi
 *.idx
