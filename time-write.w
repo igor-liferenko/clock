@@ -1,8 +1,6 @@
 @* Intro.
 
-This program runs on USB-host.
-
-As serial port is done via USB, it appears and disappears dynamically;
+Serial port is done via USB, so it appears and disappears dynamically;
 to cope with this, connect is attempted in a loop and write status
 is checked and |close| is called on serial port descriptor if necessary.
 
