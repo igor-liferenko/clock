@@ -1,10 +1,5 @@
 NOTE: as we do not write anything to USB host, we may use non-patched 
-cdc-acm driver (on raspberry pi openwrt)
-
-We handle DTR here because it is automatically sent to device by driver on open()
-('0' in patched cdc-acm driver and '1' in non-patched), otherwise time-write.w will be
-blocked on open() for 5 sec.
-TODO: check it via wireshark
+cdc-acm driver (on raspberry pi openwrt) - see ~/usb/README.DTR
 
 @x
 volatile int keydetect = 0;
