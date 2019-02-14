@@ -1,4 +1,3 @@
-* on pro micro:
+* on pro micro and on original (LEDs are not used):
 wmerge ../avrtel/avrtel time-read merged
-wmerge merged.web invert | sponge merged.web
 ctangle merged ../avrtel/invert time-read

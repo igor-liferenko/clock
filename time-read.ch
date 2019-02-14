@@ -81,7 +81,9 @@ ISR(INT1_vect)
     if (UEINTX & 1 << RXOUTI) {
       UEINTX &= ~(1 << RXOUTI);
       int rx_counter = UEBCLX;
-      if (rx_counter != 8) PORTD |= 1 << PD5; /* proof check (this cannot happen) */
+      if (rx_counter != 8) { /* proof check (this cannot happen) */
+        UDR1 = '*'; while (!(UCSR1A & 1 << UDRE1)) ;
+      }
       while (rx_counter--) {
         UDR1 = UEDATX; while (!(UCSR1A & 1 << UDRE1)) ; /* write, then wait */
       }
