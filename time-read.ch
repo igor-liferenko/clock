@@ -8,52 +8,6 @@ ISR(INT1_vect)
   keydetect = 1;
 }
 @y
-void LCD_Command( unsigned char cmnd )
-{
-        PORTF = cmnd & 0xF0; /* sending upper nibble */
-        PORTB &= ~ (1<<PB4);             /* RS=0, command reg. */
-        PORTB |= (1<<PB5);               /* Enable pulse */
-        _delay_us(1);
-        PORTB &= ~ (1<<PB5);
-
-        _delay_us(200);
-
-        PORTF = cmnd << 4;  /* sending lower nibble */
-        PORTB |= (1<<PB5);
-        _delay_us(1);
-        PORTB &= ~ (1<<PB5);
-        _delay_ms(2);
-}
-
-void LCD_Char( unsigned char data )
-{
-        PORTF = data & 0xF0; /* sending upper nibble */
-        PORTB |= (1<<PB4);               /* RS=1, data reg. */
-        PORTB |= (1<<PB5);
-        _delay_us(1);
-        PORTB &= ~ (1<<PB5);
-        _delay_us(200);
-
-        PORTF = data << 4; /* sending lower nibble */
-        PORTB |= (1<<PB5);
-        _delay_us(1);
-        PORTB &= ~ (1<<PB5);
-        _delay_ms(2);
-}
-
-void LCD_Init (void)                    /* LCD Initialize function */
-{
-        DDRF |= 0xF0;                   /* Make LCD port direction as o/p */
-        DDRB |= (1 << PB4) | (1 << PB5);
-        _delay_ms(20);                  /* LCD Power ON delay always >15ms */
-
-        LCD_Command(0x02);              /* send for 4 bit initialization of LCD  */
-        LCD_Command(0x28);              /* 2 line, 5*7 matrix in 4-bit mode */
-        LCD_Command(0x0c);              /* Display on cursor off*/
-        LCD_Command(0x06);              /* Increment cursor (shift cursor to right)*/
-        LCD_Command(0x01);              /* Clear display screen*/
-        _delay_ms(2);
-}
 @z
 
 @x
@@ -82,9 +36,9 @@ void LCD_Init (void)                    /* LCD Initialize function */
 @x
   char digit;
 @y
-  PORTE |= 1 << PE6; DDRE |= 1 << PE6;
-  LCD_Init();
-  DDRE &= ~(1 << PE6); PORTE &= ~(1 << PE6);
+  UBRR1 = 34; // table 18-12 in datasheet
+  UCSR1A |= 1 << U2X1;
+  UCSR1B |= 1 << TXEN1;
 @z
 
 @x
@@ -128,11 +82,11 @@ void LCD_Init (void)                    /* LCD Initialize function */
       UEINTX &= ~(1 << RXOUTI);
       int rx_counter = UEBCLX;
       if (rx_counter != 8) PORTD |= 1 << PD5; /* proof check (this cannot happen) */
-      PORTE |= 1 << PE6; DDRE |= 1 << PE6;
-      LCD_Command(0x80);
-      DDRE &= ~(1 << PE6); PORTE &= ~(1 << PE6);
-      while (rx_counter--)
-        LCD_Char(UEDATX);
+      while (rx_counter--) {
+        UDR1 = UEDATX; while (!(UCSR1A & 1 << UDRE1)) ; /* write, then wait */
+      }
+      UDR1 = '\r'; while (!(UCSR1A & 1 << UDRE1)) ;
+      UDR1 = '\n'; while (!(UCSR1A & 1 << UDRE1)) ;
       UEINTX &= ~(1 << FIFOCON);
     }
 @z
