@@ -1,4 +1,4 @@
 * on pro micro:
-wmerge ../avrtel/avrtel time-read >merged.w
-wmerge merged invert | sponge merged.w
+wmerge ../avrtel/avrtel time-read >merged.web
+wmerge merged.web invert | sponge merged.web
 ctangle merged ../avrtel/invert time-read

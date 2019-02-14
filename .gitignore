@@ -1,9 +1,14 @@
+*.elf
+*.hex
 time-write
-*.c
+time-write.c
+time-read.c
 *.dvi
 *.idx
 *.log
 *.ps
 *.scn
-*.tex
+time-read.tex
+time-write.tex
 *.toc
+*.web
