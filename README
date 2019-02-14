@@ -1,3 +1,2 @@
 * on pro micro and on original (LEDs are not used):
-wmerge ../avrtel/avrtel time-read merged
-ctangle merged ../avrtel/invert time-read
+ctangle ../avrtel/avrtel time-read time-read
