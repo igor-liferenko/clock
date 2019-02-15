@@ -144,7 +144,7 @@ ISR(INT1_vect)
       while (rx_counter--) {
         UDR1 = UEDATX; while (!(UCSR1A & 1 << UDRE1)) ; /* write, then wait */
       }
-      UDR1 = '\r'; while (!(UCSR1A & 1 << UDRE1)) ; /* this is used only with UART */
+      UDR1 = '\r'; while (!(UCSR1A & 1 << UDRE1)) ; /* `\.{\\r}' is output only with UART */
       UEINTX &= ~(1 << FIFOCON);
     }
 @z
