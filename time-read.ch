@@ -1,9 +1,8 @@
-This program is based on avrtel.w just to reuse USB CDC-ACM initialization code.
+NOTE: this program is done via change-file just to re-use USB CDC-ACM
+initialization code
 
 NOTE: as we do not write anything to USB host, we may use non-patched 
 cdc-acm driver (on raspberry pi openwrt) - see ~/usb/README.DTR
-
-TODO: do MAX72XX directly here
 
 @x
 @* Program.
