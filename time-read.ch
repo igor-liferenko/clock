@@ -92,7 +92,7 @@ ISR(INT1_vect)
 @x
   char digit;
 @y
-  UBRR1 = 34; // table 18-12 in datasheet
+  UBRR1 = 34; /* this is the simplest testing method - use \.{hwterm} */
   UCSR1A |= 1 << U2X1;
   UCSR1B |= 1 << TXEN1;
 @z
