@@ -1,2 +1,1 @@
-* on pro micro and on original (LEDs are not used):
 ctangle ../avrtel/avrtel time-read time-read

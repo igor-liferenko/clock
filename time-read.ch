@@ -1,5 +1,55 @@
+This program is based on avrtel.w just to reuse USB CDC-ACM initialization code.
+
 NOTE: as we do not write anything to USB host, we may use non-patched 
 cdc-acm driver (on raspberry pi openwrt) - see ~/usb/README.DTR
+
+TODO: do MAX72XX directly here
+
+@x
+@* Program.
+DTR is used by \.{tel} to switch the phone off (on timeout and for
+special commands) by switching off/on
+base station for one second (the phone looses connection to base
+station and automatically powers itself off).
+
+\.{tel} uses DTR to switch on base station when it starts;
+and when TTY is closed, DTR switches off base station.
+
+The main requirement to the phone is that base station
+must have led indicator\footnote*{For
+some phone models when base station is powered on, the indicator is turned
+on for a short time. In such case use \.{avrtel-poweron.ch}.}
+for on-hook / off-hook on base station (to be able
+to reset to initial state in state machine in \.{tel}; note, that
+measuring voltage drop in phone line to determine hook state does not work
+reliably, because it
+falsely triggers when dtmf signal is produced ---~the dtmf signal is alternating
+below the trigger level and multiple on-hook/off-hook events occur in high
+succession).
+
+Note, that relay switches off output from base station's power supply, not input
+because transition processes from 220v could damage power supply because it
+is switched on/off multiple times.
+
+Also note that when device is not plugged in,
+base station must be powered off, and it must be powered on by \.{tel} (this
+is why non-inverted relay must be used (and from such kind of relay the
+only suitable I know of is mechanical relay; and such relay gives an advantage
+that power supply with AC and DC output may be used; however, see {\tt
+TLP281.tex} how to fix TLP281 to make it behave like
+normally-open-mechanical-relay)).
+If base station
+is powered when device is not plugged in, this breaks program logic badly.
+
+%Note, that we can not use simple cordless phone---a DECT phone is needed, because
+%resetting base station to put the phone on-hook will not work
+%(FIXME: check if it is really so).
+
+$$\hbox to12.27cm{\vbox to9.87777777777778cm{\vfil\special{psfile=avrtel.3
+  clip llx=-91 lly=-67 urx=209 ury=134 rwi=3478}}\hfil}$$
+@y
+@* Program.
+@z
 
 @x
 volatile int keydetect = 0;
@@ -17,6 +67,8 @@ ISR(INT1_vect)
 @z
 
 @x
+  DDRD |= 1 << PD5; /* |PD5| is used to show on-line/off-line state
+                       and to determine when transition happens */
   @<Set |PD2| to pullup mode@>@;
   EICRA |= 1 << ISC11 | 1 << ISC10; /* set INT1 to trigger on rising edge */
   EIMSK |= 1 << INT1; /* turn on INT1; if it happens while USB RESET interrupt
@@ -25,11 +77,16 @@ ISR(INT1_vect)
     anything, as USB RESET is repeated several times by USB host, so it is safe
     that USB RESET interrupt is enabled (we cannot disable it because USB host
     may be rebooted) */
-@y
-@z
-
-@x
+  DDRB |= 1 << PB0; /* |PB0| is used to show DTR state and and to determine
+    when transition happens */
+  PORTB |= 1 << PB0; /* led on */
   DDRE |= 1 << PE6;
+
+  if (line_status.DTR != 0) { /* are unions automatically zeroed? (may be removed if yes) */
+    PORTB |= 1 << PB0;
+    PORTD |= 1 << PD5;
+    return;
+  }
 @y
 @z
 
@@ -42,14 +99,18 @@ ISR(INT1_vect)
 @z
 
 @x
+    if (line_status.DTR) {
       PORTE |= 1 << PE6; /* base station on */
-@y
-@z
-
-@x
+      PORTB &= ~(1 << PB0); /* led off */
+    }
+    else {
+      if (!(PORTB & 1 << PB0)) { /* transition happened */
         PORTE &= ~(1 << PE6); /* base station off */
         keydetect = 0; /* in case key was detected right before base station was
                           switched off, which means that nothing must come from it */
+      }
+      PORTB |= 1 << PB0; /* led on */
+    }
 @y
 @z
 
