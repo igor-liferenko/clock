@@ -141,14 +141,10 @@ ISR(INT1_vect)
     if (UEINTX & 1 << RXOUTI) {
       UEINTX &= ~(1 << RXOUTI);
       int rx_counter = UEBCLX;
-      if (rx_counter != 8) { /* proof check (this cannot happen) */
-        UDR1 = '*'; while (!(UCSR1A & 1 << UDRE1)) ;
-      }
       while (rx_counter--) {
         UDR1 = UEDATX; while (!(UCSR1A & 1 << UDRE1)) ; /* write, then wait */
       }
-      UDR1 = '\r'; while (!(UCSR1A & 1 << UDRE1)) ;
-      UDR1 = '\n'; while (!(UCSR1A & 1 << UDRE1)) ;
+      UDR1 = '\r'; while (!(UCSR1A & 1 << UDRE1)) ; /* this is used only with UART */
       UEINTX &= ~(1 << FIFOCON);
     }
 @z
