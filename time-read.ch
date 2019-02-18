@@ -92,7 +92,7 @@ ISR(INT1_vect)
 @x
   char digit;
 @y
-  UBRR1 = 34; /* this is the simplest testing method - use `\.{hwterm}' or
+  UBRR1 = 34; /* this is the simplest testing method - use
     `\.{cu dir -l /dev/ttyUSB0 -s 57600}' */
   UCSR1A |= 1 << U2X1;
   UCSR1B |= 1 << TXEN1;
