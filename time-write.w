@@ -4,6 +4,10 @@ Serial port is done via USB, so it appears and disappears dynamically;
 to cope with this, connect is attempted in a loop and write status
 is checked and |close| is called on serial port descriptor if necessary.
 
+TTY device file must not be created if it does not
+already exist. This is similar to `\.{cat >}', but |open|
+syscall is without |O_CREAT|.
+
 @d serial_port_closed() comfd == -1
 @d serial_port_opened() comfd != -1
 
