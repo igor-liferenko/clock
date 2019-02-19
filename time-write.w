@@ -44,5 +44,6 @@ if ((comfd = open("/dev/ttyACM0", O_WRONLY | O_NOCTTY)) != -1) {
 
 @ @<Header files@>=
 #include <fcntl.h>
+#include <termios.h>
 #include <time.h>
 #include <unistd.h>
