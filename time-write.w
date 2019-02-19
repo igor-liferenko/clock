@@ -30,7 +30,7 @@ void main(void)
 if ((comfd = open("/dev/ttyACM0", O_WRONLY | O_NOCTTY)) != -1) {
   struct termios com_tty;
   tcgetattr(comfd, &com_tty);
-  com_tty.c_cflag &= ~HUPCL;
+  com_tty.c_cflag &= ~HUPCL; /* DTR/RTS not set, so do not touch it */
   tcsetattr(comfd, TCSANOW, &com_tty);
 }
 
