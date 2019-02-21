@@ -98,6 +98,7 @@ ISR(INT1_vect)
 @z
 
 @x
+    @<Get |line_status|@>@;
     if (line_status.DTR) {
       PORTE |= 1 << PE6; /* base station on */
       PORTB &= ~(1 << PB0); /* led off */
