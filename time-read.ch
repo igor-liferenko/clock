@@ -224,3 +224,8 @@ UENUM = EP2; /* restore */
 @y
 @i ../usb/OUT-endpoint-management.w
 @z
+
+@x
+#include <util/delay.h> /* |_delay_us| */
+@y
+@z
