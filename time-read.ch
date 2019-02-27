@@ -94,6 +94,9 @@ ISR(INT1_vect)
 @x
   char digit;
 @y
+  UBRR1 = 34; /* this is the simplest testing method - use `\.{cu -l /dev/ttyUSB0 -s 57600}' */
+  UCSR1A |= 1 << U2X1;
+  UCSR1B |= 1 << TXEN1;
 @z
 
 @x
@@ -140,18 +143,11 @@ ISR(INT1_vect)
     if (UEINTX & 1 << RXOUTI) {
       UEINTX &= ~(1 << RXOUTI);
       int rx_counter = UEBCLX;
-      char A[8];
-      while (rx_counter--)
-        A[rx_counter] = UEDATX;
-      UEINTX &= ~(1 << FIFOCON);
-      if (line_status.all) {
-        while (!(UEINTX & 1 << TXINI)) ;
-        UEINTX &= ~(1 << TXINI);
-        for (int i = 7; i >= 0; i--)
-          UEDATX = A[i];
-//      UEDATX = '\r';
-        UEINTX &= ~(1 << FIFOCON);
+      while (rx_counter--) {
+        UDR1 = UEDATX; while (!(UCSR1A & 1 << UDRE1)) ; /* write, then wait */
       }
+      UDR1 = '\r'; while (!(UCSR1A & 1 << UDRE1)) ; /* `\.{\\r}' is output only with UART */
+      UEINTX &= ~(1 << FIFOCON);
     }
 @z
 
@@ -227,5 +223,4 @@ UENUM = EP2; /* restore */
 @i ../usb/IN-endpoint-management.w
 @y
 @i ../usb/OUT-endpoint-management.w
-@i ../usb/IN-endpoint-management.w
 @z
