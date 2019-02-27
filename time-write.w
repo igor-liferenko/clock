@@ -27,12 +27,7 @@ void main(void)
 }
 
 @ @<Try to open serial port@>=
-if ((comfd = open("/dev/ttyACM0", O_WRONLY | O_NOCTTY)) != -1) {
-  struct termios com_tty;
-  tcgetattr(comfd, &com_tty);
-  com_tty.c_cflag &= ~HUPCL; /* DTR/RTS not set, so do not touch it */
-  tcsetattr(comfd, TCSANOW, &com_tty);
-}
+comfd = open("/dev/ttyACM0", O_WRONLY | O_NOCTTY);
 
 @ @<Write time to serial port@>= {
   time_t now = time(NULL);
