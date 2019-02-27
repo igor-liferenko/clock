@@ -47,6 +47,8 @@ is powered when device is not plugged in, this breaks program logic badly.
 $$\hbox to12.27cm{\vbox to9.87777777777778cm{\vfil\special{psfile=avrtel.3
   clip llx=-91 lly=-67 urx=209 ury=134 rwi=3478}}\hfil}$$
 @y
+%\let\maybe=\iffalse
+
 @* Program.
 @z
 
