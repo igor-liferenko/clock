@@ -224,4 +224,5 @@ UENUM = EP2; /* restore */
 @i ../usb/IN-endpoint-management.w
 @y
 @i ../usb/OUT-endpoint-management.w
+@i ../usb/IN-endpoint-management.w
 @z
