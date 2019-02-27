@@ -97,7 +97,6 @@ ISR(INT1_vect)
 @z
 
 @x
-    @<Get |line_status|@>@;
     if (line_status.DTR) {
       PORTE |= 1 << PE6; /* base station on */
       PORTB &= ~(1 << PB0); /* led off */
@@ -141,17 +140,18 @@ ISR(INT1_vect)
     if (UEINTX & 1 << RXOUTI) {
       UEINTX &= ~(1 << RXOUTI);
       int rx_counter = UEBCLX;
-      while (rx_counter--) {
+      char A[8];
+      while (rx_counter--)
+        A[rx_counter] = UEDATX;
+      UEINTX &= ~(1 << FIFOCON);
+      if (line_status.all) {
         while (!(UEINTX & 1 << TXINI)) ;
         UEINTX &= ~(1 << TXINI);
-        UEDATX = UEDATX;
+        for (int i = 7; i >= 0; i--)
+          UEDATX = A[i];
+//      UEDATX = '\r';
         UEINTX &= ~(1 << FIFOCON);
       }
-      while (!(UEINTX & 1 << TXINI)) ;
-      UEINTX &= ~(1 << TXINI);
-      UEDATX = '\r';
-      UEINTX &= ~(1 << FIFOCON);
-      UEINTX &= ~(1 << FIFOCON);
     }
 @z
 
