@@ -435,7 +435,7 @@ if (empty_packet) {
 while (!(UEINTX & 1 << RXOUTI)) ; /* wait for STATUS stage */
 UEINTX &= ~(1 << RXOUTI);
 
-@i ../usb/control-endpoint-management.w
+@i ../usb/CONTROL-endpoint-management.w
 @i ../usb/OUT-endpoint-management.w
 @i ../usb/usb_stack.w
 
