@@ -1,3 +1,6 @@
+%NOTE: as we do not write anything to USB host, we may use non-patched 
+%cdc-acm driver (on raspberry pi openwrt) - see ~/usb/README.DTR
+
 %TODO: change line_status.DTR to line_status.all
 %TODO: change DTR to DTR/RTS
 %TODO: rm note about TLP281
